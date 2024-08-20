@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+<title>Create Hotel</title>
+	<link rel="stylesheet" th:href="@{../css/bootstrapupdate.min.css}"/>
+	<link rel="stylesheet" th:href="@{../css/font-awesome.min.css}"/>
+
+    <script type="text/javascript" th:src="@{../js/jquery-3.5.1.min.js}"></script>
+</head>
+<style  type="text/css">
+form {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+div {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.roomType {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.removeRoomType {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.removeRoomType:hover {
+    background-color: #c82333;
+}
+
+#roomTypes {
+    margin-bottom: 20px;
+}
+
+</style>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Hotel Management</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/list}">Hotel List</a>
+                </li>
+                <li class="nav-item" th:if="${user.userRoleStatus} == 'A'">
+                    <a class="nav-link" th:href="@{/allcart}">Cart</a>
+                </li>
+                
+                <li class="nav-item" th:unless="${user.userRoleStatus} == 'A'">
+                    <a class="nav-link" th:href="@{/cart}">Cart</a>
+                </li>
+                <!-- <li class="nav-item">
+                    <a class="nav-link" th:href="@{/create}">Create Hotel</a>
+                </li> -->
+                
+                <li class="nav-item" th:if="${user.userRoleStatus} == 'A'">
+                   <a class="nav-link" th:href="@{/create}">Create Hotel</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+            
+	            <li class="nav-item">
+	                <span class="navbar-text" th:text="${user.username}">Username</span>
+	            </li>
+	            
+	            <li class="nav-item">
+	                <a class="nav-link" th:href="@{/logout}">Logout</a>
+	            </li>
+           </ul>
+        </div>
+    </nav>
+
+<div class="container mt-4">
+<h2>Create a New Hotel</h2>
+
+<form th:action="@{/saveHotel}" method="post">
+    <div>
+        <label for="hotelName">Hotel Name:</label>
+        <input type="text" id="hotelName" name="hotelName" required>
+    </div>
+
+    <div>
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location"  required>
+    </div>
+
+   <div>
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address"  required>
+    </div>
+
+    <h3>Room Types</h3>
+    <div id="roomTypes">
+        <div class="roomType">
+            <div>
+                <label for="roomType">Room Type:</label>
+                <input type="text" name="roomTypes[0].type"  placeholder="e.g., Deluxe" required>
+            </div>
+            <div>
+                <label for="availableRooms">Available Rooms:</label>
+                <input type="number" name="roomTypes[0].availableRooms"  required>
+            </div>
+            <div>
+                <label for="pricePerNight">Price per Night:</label>
+                <input type="number" name="roomTypes[0].pricePerNight"  required>
+            </div>
+            <div>
+			    <label for="amenities">Amenities :</label>
+			    <input type="text" name="roomTypes[0].amenitiesString" placeholder="e.g., Wi-Fi, Breakfast" required>
+			</div>
+        </div>
+    </div>
+    
+    <button type="button" onclick="addRoomType()">Add Another Room Type</button>
+     <button type="button" onclick="removeRoomType()">Clear Room Type</button>
+    <button type="submit">Create Hotel</button>
+</form>
+</div>
+<script>
+    let roomTypeIndex = 1;
+
+     function addRoomType() {
+        const roomTypeHtml = `
+            <div class="roomType">
+                <div>
+                    <label for="roomType">Room Type:</label>
+                    <input type="text" name="roomTypes[` + roomTypeIndex + `].type" placeholder="e.g., Deluxe" required>
+                </div>
+                <div>
+                    <label for="availableRooms">Available Rooms:</label>
+                    <input type="number" name="roomTypes[` + roomTypeIndex + `].availableRooms" required>
+                </div>
+                <div>
+                    <label for="pricePerNight">Price per Night:</label>
+                    <input type="number" name="roomTypes[` + roomTypeIndex + `].pricePerNight" required>
+                </div>
+                <div>
+                    <label for="amenities">Amenities (comma-separated):</label>
+                    <input type="text" name="roomTypes[` + roomTypeIndex + `].amenitiesString" placeholder="e.g., Wi-Fi, Breakfast" required>
+                </div>
+            </div>
+        `;
+        document.getElementById('roomTypes').insertAdjacentHTML('beforeend', roomTypeHtml);
+        roomTypeIndex++;
+    } 
+     
+     function removeRoomType(button) {
+         const roomTypesContainer = document.getElementById('roomTypes');
+         const roomTypeDivs = roomTypesContainer.getElementsByClassName('roomType');
+         
+         if (roomTypeDivs.length > 0) {
+             roomTypesContainer.removeChild(roomTypeDivs[roomTypeDivs.length - 1]);
+         }
+     }
+</script>
+
+</body>
+</html>
